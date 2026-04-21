@@ -16,10 +16,10 @@ class CorsMiddleware
             $response = $next($request);
         }
 
-        // Dynamic CORS origin for localhost development
         $origin = $request->header('Origin');
-        if ($origin && (strpos($origin, 'http://localhost:') === 0 || strpos($origin, 'http://127.0.0.1:') === 0)) {
+        if ($origin && $this->isAllowedOrigin($origin)) {
             $response->headers->set('Access-Control-Allow-Origin', $origin);
+            $response->headers->set('Vary', 'Origin');
         }
 
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
@@ -27,5 +27,19 @@ class CorsMiddleware
         $response->headers->set('Access-Control-Max-Age', '3600');
 
         return $response;
+    }
+
+    private function isAllowedOrigin(string $origin): bool
+    {
+        if (strpos($origin, 'http://localhost:') === 0 || strpos($origin, 'http://127.0.0.1:') === 0) {
+            return true;
+        }
+
+        $frontendUrl = trim((string) env('FRONTEND_URL', ''));
+        if ($frontendUrl !== '' && rtrim($frontendUrl, '/') === rtrim($origin, '/')) {
+            return true;
+        }
+
+        return false;
     }
 }
