@@ -27,7 +27,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-RUN cp .env.example .env \
+RUN if [ -f .env.example ]; then cp .env.example .env; else touch .env; fi \
     && composer install --no-dev --optimize-autoloader --no-interaction \
     && php artisan config:clear \
     && php artisan route:clear \
