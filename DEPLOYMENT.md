@@ -1,10 +1,10 @@
-# Render + FreeDB
+# Render Docker + FreeDB
 
 ## Render
 
-- Runtime: `PHP`
+- Runtime: `Docker`
 - Branch: `main`
-- Build/start commands: see `render.yaml`
+- Dockerfile: `Dockerfile`
 - Health check path: `/up`
 
 Set these environment variables in Render:
@@ -39,3 +39,12 @@ php artisan key:generate --show
 ## FreeDB
 
 Use the FreeDB MySQL connection details in the Render environment variables above.
+
+## Render Service Settings
+
+- Service type: `Web Service`
+- Environment: `Docker`
+- Root directory: leave blank
+- Dockerfile path: `./Dockerfile`
+- Build command: leave blank
+- Start command: leave blank
