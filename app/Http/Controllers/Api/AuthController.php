@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AdminSetting;
 use App\Models\User;
+use Database\Seeders\AdminSeeder;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -133,6 +134,8 @@ class AuthController extends Controller
             ], 422);
         }
 
+        $this->ensureDefaultUsersForHostedDemo($identifier);
+
         $user = $this->resolveLoginUser($identifier);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -161,6 +164,27 @@ class AuthController extends Controller
                 'error_code' => $e->getCode(),
             ], 500);
         }
+    }
+
+    private function ensureDefaultUsersForHostedDemo(string $identifier): void
+    {
+        $normalized = strtoupper(str_replace(' ', '', trim($identifier)));
+        $isKnownDemoLogin = in_array($normalized, [
+            'USER@WALLET.COM',
+            'ADMIN@WALLET.COM',
+            'XTUS0002',
+            'XTAD0001',
+        ], true);
+
+        if (!$isKnownDemoLogin) {
+            return;
+        }
+
+        if (User::whereIn('email', ['admin@wallet.com', 'user@wallet.com'])->count() >= 2) {
+            return;
+        }
+
+        app(AdminSeeder::class)->run();
     }
 
     public function frontendStatus()
