@@ -1,7 +1,8 @@
 .git
 .gitignore
 .env
-.env.*
+.env.backup
+.env.production
 vendor
 node_modules
 storage/logs
